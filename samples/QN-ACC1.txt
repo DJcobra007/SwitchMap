@@ -1,0 +1,127 @@
+=~=~=~=~=~=~=~=~=~=~=~= PuTTY log 2026.01.01 10:00:00 =~=~=~=~=~=~=~=~=~=~=~=
+QN-a00011#hos [Dt [D [D [Dconf t
+QN-a00011(config)#hostname QN-ACC1-STORE-BUILDING-A
+QN-ACC1-STORE-BU...#terminal datadump
+sh runn
+QN-ACC1-STORE-BU...#config-file-header
+QN-ACC1-STORE-BUILDING-A
+v7.2.7.14 / RLINUX_900_100
+CLI v1.0
+@
+vlan database
+vlan 10,20,30
+exit
+hostname QN-ACC1-STORE-BUILDING-A
+username netadmin password encrypted 0123456789abcdef0123456789abcdef01234567 privilege 15
+snmp-server community s4mpleComm rw view all
+sntp server ntp.qntmnet.com poll
+ip domain name example.local
+ip name-server  10.20.10.5
+!
+interface vlan 10
+ name MGMT
+ ip address 10.20.10.11 255.255.255.0
+ management-vlan
+!
+interface vlan 20
+ name USERS
+!
+interface vlan 30
+ name GUEST
+!
+interface GigabitEthernet1/0/2
+ description AP-STORE-01
+ switchport mode trunk
+ switchport trunk native vlan 20
+!
+interface GigabitEthernet1/0/4
+ description PC-STORE
+ switchport access vlan 20
+!
+interface GigabitEthernet1/0/9
+ description spare
+ shutdown
+ switchport access vlan 30
+!
+interface GigabitEthernet1/0/12
+ description to-QQ-ACC2
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/0/1
+ description to-core
+ switchport mode trunk
+!
+exit
+ip default-gateway 10.20.10.1
+QN-ACC1-STORE-BU...#more system-info
+*************************************************
+*********   SWITCH SYSTEM INFORMATION   *********
+*************************************************
+
+Model Number : QN-SW-225-12P
+Serial Number : QNTEST0A0011
+MAC Address : 58:61:63:a0:00:11
+Switch Firmware Version : 2.3.20.00
+*************************************************
+QN-ACC1-STORE-BU...#sh inventory
+
+NAME: "1"  DESCR: "12 GE 2x10G ports Managed Switch with POE"
+PID: 2612GP-2XGF  VID:  0  SN: QNTEST0A0011
+NAME: "TenGigabitEthernet1/0/1"  DESCR: "SFP 10G BASE-LR"
+PID: QN-UTSPP-LR    VID: QUANTUM NETWORK    SN: QNSFPTEST011
+QN-ACC1-STORE-BU...#sh int status
+                                              Flow Link          Back   Mdix
+Port      Type         Duplex  Speed  Neg      ctrl State       Pressure Mode
+--------- ------------ ------  ------ -------- ---- ----------- -------- -------
+gi1/0/2   1G-Copper    Full    1000   Enabled  Off  Up          Disabled Off
+gi1/0/4   1G-Copper    Full    100    Enabled  Off  Up          Disabled Off
+gi1/0/9   1G-Copper      --      --     --      --  Down           --      --
+gi1/0/12  1G-Copper    Full    1000   Enabled  Off  Up          Disabled Off
+te1/0/1   10G-Fiber    Full    10000  Enabled  Off  Up          Disabled Off
+
+                                          Flow    Link        
+Ch       Type    Duplex  Speed  Neg      control  State       
+-------- ------- ------  -----  -------- -------  ----------- 
+Po1         --     --      --      --       --    Not Present 
+QN-ACC1-STORE-BU...#sh int confi
+                                               Flow    Admin     Back   Mdix
+Port      Type         Duplex  Speed  Neg      control  State   Pressure Mode
+--------- ------------ ------  -----  -------- -------  -----   -------- ----
+gi1/0/2   1G-Copper    Full    1000   Enabled  Off      Up      Disabled Auto
+gi1/0/9   1G-Copper    Full    1000   Enabled  Off      Down    Disabled Auto
+gi1/0/12  1G-Copper    Full    1000   Enabled  Off      Up      Disabled Auto
+QN-ACC1-STORE-BU...#sh lldp neigh
+System capability legend:
+B - Bridge; R - Router; W - Wlan Access Point; T - telephone;
+D - DOCSIS Cable Device; H - Host; r - Repeater;
+TP - Two Ports MAC Relay; S - S-VLAN; C - C-VLAN; O - Other
+
+  Port        Device ID         Port ID          System Name    Capabilities  TTL  
+--------- ----------------- ----------------- ----------------- ------------ ----- 
+gi1/0/2   80:03:84:00:00:02 80:03:84:00:00:02 AP-STORE-01           B, W     110  
+gi1/0/12  58:61:63:a0:00:12  Ethernet1/0/26   QQ-ACC2               B, R     110  
+te1/0/1   58:61:63:a0:00:01      tf1/0/1      QN-CORE-SERVER-RO     B, R     110  
+                                              OM-STK
+
+QN-ACC1-STORE-BU...#sh spanning-tree
+
+Spanning tree enabled mode: RSTP
+
+  Root ID    Priority:   0
+             Address:    58:61:63:a0:00:01
+             Cost:       2000
+             Port:       te1/0/1
+  Bridge ID  Priority:   32768
+             Address:    58:61:63:a0:00:11
+
+Interfaces
+  Name     State    Prio.Nbr   Cost    Sts   Role PortFast Type
+--------- -------- --------- -------- ------ ---- -------- -----------------
+ gi1/0/2  enabled    128.2    20000    Frw   Desg   Yes      P2P (RSTP)
+gi1/0/12  enabled   128.12    20000    Blk   Altn    No      P2P (RSTP)
+ te1/0/1  enabled   128.49     2000    Frw   Root    No      P2P (RSTP)
+
+QN-ACC1-STORE-BU...#sh ver
+Active-image: flash://system/images/QN_SW-AG-2.3.20.00.qntm
+  Version: 2.3.20.00
+QN-ACC1-STORE-BU...#exit

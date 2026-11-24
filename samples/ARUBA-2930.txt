@@ -1,0 +1,33 @@
+Running configuration:
+
+; JL253A Configuration Editor; Created on release #WC.16.10.0003
+hostname "ARUBA-2930"
+stacking
+   member 1 type "JL253A" mac-address 9457a5-1d2e00
+   member 2 type "JL253A" mac-address 9457a5-1d3f00
+   exit
+vlan 1
+   name "DEFAULT_VLAN"
+   no untagged 1
+   exit
+vlan 10
+   name "MGMT"
+   tagged 1/25
+   ip address 10.10.10.21 255.255.255.0
+   exit
+ip default-gateway 10.10.10.1
+spanning-tree
+
+ARUBA-2930# show system
+ System Name        : ARUBA-2930
+ Software revision  : WC.16.10.0003
+ Base MAC Addr      : 9457a5-1d2e00
+ Serial Number      : SG9BKP1234
+
+ARUBA-2930# show lldp info remote-device
+
+  LLDP Remote Devices Information
+
+  LocalPort | ChassisId                 PortId PortDescr SysName
+  --------- + ------------------------- ------ --------- ----------------------
+  1/25      | 0c d0 f8 b5 11 00         Gi1/0/5  Gi1/0/5 CORE-STK

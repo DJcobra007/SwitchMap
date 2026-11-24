@@ -1,0 +1,13 @@
+#
+hostname "SG3428"
+vlan 10
+ name "MGMT"
+interface vlan 10
+ ip address-alloc static ip-address 10.10.10.40 mask 255.255.255.0
+ip route 0.0.0.0 0.0.0.0 10.10.10.1
+spanning-tree mode rstp
+SG3428#show system-info
+ System Description - JetStream 24-Port Gigabit L2 Managed Switch with 4 SFP Slots
+ Firmware Version   - 3.0.0 Build 20200923 Rel.57812
+ MAC Address        - 00-0A-EB-12-34-56
+ Serial Number      - 2171234567890

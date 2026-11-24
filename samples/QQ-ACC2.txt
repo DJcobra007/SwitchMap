@@ -1,0 +1,90 @@
+=~=~=~=~=~=~=~=~=~=~=~= PuTTY log 2026.01.01 10:00:00 =~=~=~=~=~=~=~=~=~=~=~=
+QQ-ACC2#ter length 0
+QQ-ACC2#sh running-config
+!
+service password-encryption
+!
+hostname QQ-ACC2
+sysLocation Store
+sysContact Default
+!
+enable password level 15 7 00112233445566778899aabbccddeeff
+username admin privilege 15 password 7 00112233445566778899aabbccddeeff
+!
+spanning-tree mode RSTP
+!
+vlan 1;20;30
+!
+vlan 10
+ name MGMT
+!
+Interface Ethernet1/0/1
+ description PC-01
+ switchport access vlan 20
+!
+Interface Ethernet1/0/25
+ description to-QN-CORE
+ switchport mode trunk
+!
+Interface Ethernet1/0/26
+ description to-QN-ACC1
+ switchport mode trunk
+!
+interface Vlan10
+ ip address 10.20.10.12 255.255.255.0
+!
+ip route 0.0.0.0/0 10.20.10.1
+!
+sntp server 10.20.10.5 source vlan 10
+!
+QQ-ACC2#sh version
+  Device: QQ-SW-155-G24P-4SFPP, sysLocation: Store.
+  CPU MAC          58-61-63-A0-00-12
+  VLAN MAC         58-61-63-A0-00-13
+  SoftWare Version QN_SW_QQ-2.6.03.24
+  BootRom Version  V2.00
+  Serial Num:QNTEST0A0012
+QQ-ACC2#sh lldp nei
+% Incomplete command.
+QQ-ACC2#sh vlan
+VLAN Name         Type       Media     Ports
+---- ------------ ---------- --------- ----------------------------------------
+1    default      Static     ENET      Ethernet1/0/25(T)   Ethernet1/0/26(T)
+10   MGMT         Static     ENET      Ethernet1/0/25(T)   Ethernet1/0/26(T)
+20   VLAN0020     Static     ENET      Ethernet1/0/1       Ethernet1/0/25(T)
+                                       Ethernet1/0/26(T)
+QQ-ACC2#sh spanning-tree
+                 -- RSTP Bridge Config Info --
+Standard     :  IEEE 802.1w
+Bridge MAC   :  58:61:63:a0:00:12
+#############################################################
+Self Bridge Id   : 32768.58:61:63:a0:00:12
+Root Id          : 0.58:61:63:a0:00:01
+Ext.RootPathCost : 2000
+Root Port ID     : 128.025
+
+   PortName       ID     Port Path Cost    ExtRPC  State Role     DsgBridge      DsgPort
+-------------- -------- ---------------- --------- ----- ---- ------------------ -------
+ Ethernet1/0/1 128.001            20000       2000   FWD DSGN 32768.586163a00012 128.001
+Ethernet1/0/25 128.025             2000          0   FWD ROOT     0.586163a00001 128.085
+Ethernet1/0/26 128.026            20000       2000   FWD DSGN 32768.586163a00012 128.026
+QQ-ACC2#sh interface
+Interface brief:
+  Ethernet1/0/1 is up, line protocol is up
+  Ethernet1/0/1 is layer 2 port, alias name is PC-01, index is 1
+  Hardware is Gigabit-TX, address is 58-61-63-A0-00-12
+  Auto-duplex: Negotiation full-duplex, Auto-speed: Negotiation 1G bits
+Interface brief:
+  Ethernet1/0/2 is down, line protocol is down
+  Ethernet1/0/2 is layer 2 port, alias name is (null), index is 2
+  Hardware is Gigabit-TX, address is 58-61-63-A0-00-12
+Interface brief:
+  Ethernet1/0/25 is up, line protocol is up
+  Ethernet1/0/25 is layer 2 port, alias name is to-QN-CORE, index is 25
+  Hardware is SFP+, address is 58-61-63-A0-00-12
+  Auto-duplex: Negotiation full-duplex, Auto-speed: Negotiation 10G bits
+Interface brief:
+  Ethernet1/0/26 is up, line protocol is up
+  Ethernet1/0/26 is layer 2 port, alias name is to-QN-ACC1, index is 26
+  Hardware is Gigabit-TX, address is 58-61-63-A0-00-12
+QQ-ACC2#exit

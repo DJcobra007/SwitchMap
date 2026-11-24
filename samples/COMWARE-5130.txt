@@ -1,0 +1,18 @@
+#
+ version 7.1.070, Release 3208P05
+#
+ sysname H3C-5130
+#
+vlan 10
+ name MGMT
+#
+interface Vlan-interface10
+ ip address 10.10.10.60 255.255.255.0
+#
+ip route-static 0.0.0.0 0 10.10.10.1
+ stp mode rstp
+<H3C-5130>display device manuinfo
+Slot 1:
+DEVICE_NAME          : HPE 5130-24G-4SFP+ EI
+DEVICE_SERIAL_NUMBER : CN98765432
+MAC_ADDRESS          : 3C-8A-B0-11-22-33

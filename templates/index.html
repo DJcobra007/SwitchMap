@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SwitchMap - switch inventory and topology from backups</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header class="top">
+  <h1>SwitchMap</h1>
+  <p class="tag">Switch backups in, inventory workbook and topology diagram out.</p>
+  <nav id="downloads" class="downloads" hidden>
+    <a id="dl-xlsx" class="btn primary dl" href="#"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="3" fill="#1D6F42"/><path d="M7.5 7l9 10M16.5 7l-9 10" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>Inventory</a>
+    <label class="chk" title="Merged cells look neater but make Excel slower to scroll, sort and filter on large sets"><input id="merge" type="checkbox" checked> Merge cells</label>
+    <div class="dlmenu">
+      <button id="dl-diagram" class="btn dl" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="dl-formats"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8.5" y="2.5" width="7" height="5" rx="1"/><rect x="2" y="16.5" width="7" height="5" rx="1"/><rect x="15" y="16.5" width="7" height="5" rx="1"/><path d="M12 7.5v4.5M5.5 16.5V12h13v4.5"/></svg>Diagram</button>
+      <div id="dl-formats" class="dlmenu-list" role="menu" hidden>
+        <button type="button" role="menuitem" data-fmt="vsdx">Visio <span>.vsdx</span></button>
+        <button type="button" role="menuitem" data-fmt="svg">SVG <span>.svg</span></button>
+        <button type="button" role="menuitem" data-fmt="png">PNG <span>.png</span></button>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section id="upload" class="card">
+    <h2>Upload backups</h2>
+    <div id="drop" class="drop" tabindex="0">
+      <p><strong>Drop backup files here</strong> or <label for="files" class="link">choose files</label></p>
+      <p class="hint">Plain text or .zip. Include <code>show version</code>, <code>show inventory</code>, <code>show interfaces status</code>, <code>show spanning-tree</code> and <code>show cdp/lldp neighbors detail</code> output in the backup when you can: the config alone has no serials, port status or neighbours.</p>
+      <input id="files" type="file" multiple hidden>
+      <ul id="filelist" class="filelist"></ul>
+    </div>
+    <div class="row">
+      <label for="vendor">Vendor</label>
+      <select id="vendor">
+        <option value="auto">Auto-detect</option>
+        {% for key, label in vendors.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+      </select>
+      <button id="go" class="btn primary" type="button" disabled>Analyse backups</button>
+    </div>
+    <p id="msg" class="msg" role="status"></p>
+  </section>
+
+  <section id="results" hidden>
+    <div class="tabs" role="tablist">
+      <button class="tab on" data-tab="dashboard" role="tab">Dashboard</button>
+      <button class="tab" data-tab="topology" role="tab">Topology</button>
+    </div>
+
+    <div id="tab-dashboard" class="pane">
+      <div id="stats" class="stats"></div>
+      <div class="card"><h2>Standard configuration</h2><div id="std"></div></div>
+      <div class="card"><h2>Misconfigurations</h2><div id="findings"></div></div>
+      <div class="grid2">
+        <div class="card">
+          <h2>VLANs</h2>
+          <label for="vlan-switch">Switch</label>
+          <select id="vlan-switch"></select>
+          <details open id="vlan-drop"><summary id="vlan-sum"></summary><div id="vlan-list"></div></details>
+        </div>
+        <div class="card"><h2>Switches</h2><div id="sw-table" class="scroll"></div></div>
+      </div>
+      <div class="card"><h2>What was missing from the backups</h2><div id="warns"></div></div>
+    </div>
+
+    <div id="tab-topology" class="pane" hidden>
+      <div class="legend">
+        <span><i class="ln fiber"></i>Fibre / SFP</span><span><i class="ln utp"></i>UTP</span>
+        <span><i class="ln blk"></i>STP blocked port</span><span><i class="fwbox"></i>Firewall</span><span><i class="lagln"></i>Port-channel (name + member ports)</span><span><i class="blkt">BLK</i>blocked end</span><span><i class="rootb">ROOT</i>STP root bridge</span><span class="hint">Scroll to zoom, drag the background to pan, hover a switch to highlight its cables, click for details, drag a switch anywhere to move it (its cables re-route when you let go).</span>
+        <span class="tools"><input id="find" list="hostlist" placeholder="Find switch..." aria-label="Find switch"><datalist id="hostlist"></datalist>
+          <button class="btn" id="z-out" type="button" aria-label="Zoom out">-</button><button class="btn zpct" id="z-pct" type="button" title="Click for 100% (actual size)">100%</button><button class="btn" id="z-in" type="button" aria-label="Zoom in">+</button><button class="btn" id="z-fit" type="button" title="Show the whole diagram">Fit</button></span>
+      </div>
+      <div class="stage">
+        <div class="cwrap"><div id="canvas" class="canvas" tabindex="0" aria-label="Network diagram: scroll to zoom, drag to pan"></div><div id="minimap" class="minimap" hidden title="Overview: click or drag to move"></div></div>
+        <aside id="panel" class="panel" hidden></aside>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="credit">
+  <p>SwitchMap &middot; Designed and developed by <strong>Pratham Chokshi</strong> &middot; &copy; 2026</p>
+</footer>
+<div id="tip" class="tip" hidden></div>
+
+<script src="{{ url_for('static', filename='js/api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/diagram.js') }}"></script>
+<script src="{{ url_for('static', filename='js/panel.js') }}"></script>
+<script src="{{ url_for('static', filename='js/panel_l3.js') }}"></script>
+<script src="{{ url_for('static', filename='js/compliance.js') }}"></script>
+<script src="{{ url_for('static', filename='js/findings.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

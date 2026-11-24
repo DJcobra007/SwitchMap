@@ -1,0 +1,13 @@
+! Chassis:
+system name "OS6450-A"
+! VLAN:
+vlan 1 enable name "VLAN 1"
+vlan 10 enable name "Mgmt"
+! IP:
+ip interface "mgmt" address 10.10.10.30 mask 255.255.255.0 vlan 10 ifindex 1
+ip static-route 0.0.0.0 mask 0.0.0.0 gateway 10.10.10.1 metric 1
+-> show chassis
+Chassis 1
+  Model Name:                    OS6450-P24,
+  Serial Number:                 N1234567,
+  MAC Address:                   e8:e7:32:11:22:33,

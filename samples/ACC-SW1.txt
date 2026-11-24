@@ -1,0 +1,115 @@
+version 15.2
+hostname ACC-SW1
+!
+vlan 10
+ name MGMT
+vlan 20
+ name USERS
+!
+spanning-tree mode rapid-pvst
+!
+interface GigabitEthernet1/0/10
+ description AP-515-Floor1
+ switchport access vlan 20
+!
+interface Port-channel2
+ description bundle to CORE-STK
+ switchport mode trunk
+!
+interface GigabitEthernet1/0/46
+ description to CORE-STK Gi2/0/3
+ channel-group 2 mode active
+!
+interface GigabitEthernet1/0/20
+ description SOPHOS-XGS2300 LAN
+!
+interface GigabitEthernet1/0/21
+ description uplink to FortiGate-100F
+!
+interface GigabitEthernet1/0/47
+ description ring to ACC-SW2
+ switchport mode trunk
+ switchport trunk native vlan 10
+!
+interface GigabitEthernet1/0/48
+ description to CORE-STK
+ switchport mode trunk
+ channel-group 2 mode active
+!
+interface Vlan10
+ ip address 10.10.10.11 255.255.255.0
+!
+ip default-gateway 10.10.10.1
+snmp-server trap-source Vlan10
+ip http server
+line vty 0 4
+ transport input telnet ssh
+aaa new-model
+aaa authentication login default group tacacs+ local
+aaa authorization exec default group tacacs+ local
+aaa accounting exec default start-stop group tacacs+
+tacacs server T1
+ address ipv4 10.10.10.10
+ntp server 10.10.10.20
+snmp-server community S3cretRO RO
+snmp-server location HQ
+snmp-server host 10.10.10.50 version 2c S3cretRO
+ip name-server 10.10.10.30
+ip domain name corp.local
+end
+
+ACC-SW1#show version
+Cisco IOS Software, C2960X Software (C2960X-UNIVERSALK9-M), Version 15.2(7)E3, RELEASE SOFTWARE (fc2)
+cisco WS-C2960X-48FPD-L (APM86XXX) processor (revision A0) with 524288K bytes of memory.
+Processor board ID FCW2133L0AB
+Base ethernet MAC Address       : 00:1E:F7:AA:10:00
+Model number                    : WS-C2960X-48FPD-L
+System serial number            : FCW2133L0AB
+
+ACC-SW1#show interfaces status
+
+Port      Name               Status       Vlan       Duplex  Speed  Type
+Gi1/0/1   PC-reception       connected    20         a-full  a-100  10/100/1000BaseTX
+Gi1/0/10  AP-515-Floor1      connected    20         a-full  a-1000 10/100/1000BaseTX
+Gi1/0/2                      notconnect   20         auto    auto   10/100/1000BaseTX
+Gi1/0/3                      notconnect   20         auto    auto   10/100/1000BaseTX
+Gi1/0/4                      notconnect   20         auto    auto   10/100/1000BaseTX
+Gi1/0/47  ring to ACC-SW2    connected    trunk      a-full  a-1000 10/100/1000BaseTX
+Gi1/0/48  to CORE-STK        connected    trunk      a-full  a-1000 10/100/1000BaseTX
+Gi1/1/1                      notconnect   1          auto    auto   Not Present
+
+ACC-SW1#show etherchannel summary
+Group  Port-channel  Protocol    Ports
+------+-------------+-----------+-----------------------------------------------
+2      Po2(SU)         LACP      Gi1/0/46(P) Gi1/0/48(P)
+
+ACC-SW1#show spanning-tree
+
+VLAN0001
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    24577
+             Address     0cd0.f8b5.1100
+             Cost        4
+             Port        48 (GigabitEthernet1/0/48)
+  Bridge ID  Priority    32769
+             Address     001e.f7aa.1000
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Gi1/0/47            Desg FWD 4         128.47   P2p
+Gi1/0/48            Root FWD 4         128.48   P2p
+
+ACC-SW1#show lldp neighbors detail
+------------------------------------------------
+Local Intf: Gi1/0/10
+Chassis id: 9c1c.1234.5678
+Port id: 9C:1C:12:34:56:78
+Port Description: eth0
+System Name: AP-515-Floor1
+System Description:
+ArubaOS (MODEL: 515), Version 8.10.0.2
+Time remaining: 99 seconds
+System Capabilities: B,W,R
+Enabled Capabilities: B,W
+Management Addresses:
+    IP: 10.10.20.60
+Auto Negotiation - supported, enabled

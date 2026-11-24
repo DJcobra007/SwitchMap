@@ -1,0 +1,76 @@
+version 15.2
+hostname ACC-SW2
+!
+vlan 10
+ name MGMT
+!
+spanning-tree mode rapid-pvst
+!
+interface GigabitEthernet1/0/12
+ switchport access vlan 99
+!
+interface GigabitEthernet1/0/47
+ description ring to ACC-SW1
+ switchport mode trunk
+ switchport trunk native vlan 20
+!
+interface Vlan10
+ ip address 10.10.10.12 255.255.255.0
+!
+ip default-gateway 10.10.10.1
+aaa new-model
+aaa authentication login default group tacacs+ local
+tacacs server T1
+ address ipv4 10.10.10.10
+snmp-server community S3cretRO RO
+snmp-server community public RO
+snmp-server location HQ
+snmp-server host 10.10.10.50 version 2c S3cretRO
+ip name-server 8.8.8.8
+ip domain name corp.local
+end
+
+ACC-SW2#show version
+cisco WS-C2960X-24PS-L (APM86XXX) processor (revision A0) with 524288K bytes of memory.
+Cisco IOS Software, C2960X Software (C2960X-UNIVERSALK9-M), Version 15.2(7)E3, RELEASE SOFTWARE (fc2)
+Base ethernet MAC Address       : 00:1E:F7:BB:20:00
+Model number                    : WS-C2960X-24PS-L
+System serial number            : FCW2201Q0CD
+
+ACC-SW2#show inventory
+NAME: "1", DESCR: "WS-C2960X-24PS-L"
+PID: WS-C2960X-24PS-L  , VID: V01  , SN: FCW2201Q0CD
+
+NAME: "TenGigabitEthernet1/1/1", DESCR: "SFP-10GBase-SR"
+PID: SFP-10G-SR        , VID: V03  , SN: FNS24120XYZ
+
+ACC-SW2#show interfaces status
+
+Port      Name               Status       Vlan       Duplex  Speed  Type
+Gi1/0/12  AP-Warehouse       connected    10         a-full  a-1000 10/100/1000BaseTX
+Gi1/0/47  ring to ACC-SW1    connected    trunk      a-full  a-1000 10/100/1000BaseTX
+Te1/1/1   to CORE-STK        connected    trunk      full    10G    SFP-10GBase-SR
+
+ACC-SW2#show spanning-tree
+
+VLAN0001
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    24577
+             Address     0cd0.f8b5.1100
+             Cost        2
+             Port        50 (TenGigabitEthernet1/1/1)
+  Bridge ID  Priority    32769
+             Address     001e.f7bb.2000
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Gi1/0/47            Altn BLK 4         128.47   P2p
+Te1/1/1             Root FWD 2         128.50   P2p
+
+ACC-SW2#show cdp neighbors detail
+-------------------------
+Device ID: AP-Warehouse
+Entry address(es):
+  IP address: 10.10.10.70
+Platform: cisco AIR-AP2802I-E-K9,  Capabilities: Trans-Bridge
+Interface: GigabitEthernet1/0/12,  Port ID (outgoing port): GigabitEthernet0
+Holdtime : 140 sec

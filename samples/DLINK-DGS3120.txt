@@ -1,0 +1,9 @@
+# DGS-3120-24TC Gigabit Ethernet Switch
+# Configuration
+# Firmware: Build 2.00.B011
+config ipif System ipaddress 10.10.10.50/24 vlan default state enable
+create iproute default 10.10.10.1 1
+create vlan Mgmt tag 10
+config snmp system_name DGS3120
+enable stp
+config stp version rstp

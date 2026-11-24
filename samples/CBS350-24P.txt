@@ -1,0 +1,32 @@
+config-file-header
+CBS-LAB
+v3.5.0.24 / RCBS3.5_900_100
+CLI v1.0
+file SSD indicator encrypted
+@
+vlan database
+vlan 10
+exit
+hostname CBS-LAB
+interface vlan 10
+ name MGMT
+ ip address 10.20.10.40 255.255.255.0
+!
+interface GigabitEthernet1
+ description uplink
+ switchport mode trunk
+!
+exit
+ip default-gateway 10.20.10.1
+CBS-LAB#show inventory
+NAME: "1"  DESCR: "CBS350-24P-4G 24-Port Gigabit PoE Managed Switch"
+PID: CBS350-24P-4G       VID: V02      SN: FOC0000X0AB
+CBS-LAB#show system
+System Description:                       CBS350-24P-4G 24-Port Gigabit PoE Managed Switch with 4-Port 1G SFP
+System MAC Address:                       e8:0a:b9:00:00:40
+CBS-LAB#show interfaces status
+                                             Flow Link          Back   Mdix
+Port     Type         Duplex  Speed Neg      ctrl State       Pressure Mode
+-------- ------------ ------  ----- -------- ---- ----------- -------- -------
+gi1      1G-Copper    Full    1000  Enabled  Off  Up          Disabled On
+gi2      1G-Copper      --      --     --     --  Down           --     --
